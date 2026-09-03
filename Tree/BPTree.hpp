@@ -18,9 +18,6 @@ public:
 	using SpanType = std::span<uint8_t>;
 	using CSpanType = std::span<const uint8_t>;
 
-	constexpr static const uint64_t u64MagicNumber = 0x43'4A'46'32'4D'59'44'42;// "CJF2MYDB"
-	constexpr static const uint64_t u64CurrentPageVersion = 0x00'00'00'00'00'00'00'00;// 0.0版本，高32bit为major version，低32bit为minor version
-
 	enum class PageType : uint8_t
 	{
 		INVALID = 0,
@@ -33,17 +30,24 @@ public:
 	struct PageHeader
 	{
 		uint64_t u64MagicNumber;//判断是否是此数据库页面
+
 		uint64_t u64PageVersion;//页面自身版本号
 		uint64_t u64PageLSN;//页面序列号
-		uint64_t u64PagePayloadSize;//实际数据大小
-		uint64_t u64Checksum;//校验值
-		uint8_t u8PageType;//页面存储的数据类型
 
+		uint64_t u64PageHeaderSize;//页面头大小
+		uint64_t u64PagePayloadSize;//实际数据大小
+
+		uint64_t u64PageChecksum;//校验值，使用CRC64，计算值时，本字段总是为0，并在完成计算后回填，与header其他字段做特殊处理
+
+		uint8_t u8PageType;//页面存储的数据类型
 		uint8_t u8Padding[3];//对齐4bytes边界，无用
 	};
 #pragma pack(pop)
-	constexpr static const uint64_t u64CurrentPageHeaderSize = sizeof(PageHeader);
+	static_assert(std::is_trivially_copyable_v<PageHeader>);
 
+	constexpr static const uint64_t u64MagicNumber = 0x43'4A'46'32'4D'59'44'42;// "CJF2MYDB"
+	constexpr static const uint64_t u64CurrentPageVersion = 0x00'00'00'00'00'00'00'00;// 0.0版本，高32bit为major version，低32bit为minor version
+	constexpr static const uint64_t u64CurrentPageHeaderSize = sizeof(PageHeader);
 
 public:
 
