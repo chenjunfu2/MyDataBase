@@ -4,15 +4,17 @@
 
 int main(void)
 {
-	char arr[] = "Hello World!";
+	constexpr char arr[] = "Hello World!";
 	printf("str = %s\n\n", arr);
 
 	{
-		CRC64 crc;
-		crc.ResetCrcTable(0x42F0E1EBA9EA3693ULL);
-		crc.ResetCrcState(0xFFFFFFFFFFFFFFFFULL);
-		crc.UpdateCrcState(arr, sizeof(arr) - 1);
-		printf("CRC64 = 0x%llX\n", crc.GetCrcState(true, 0xFFFFFFFFFFFFFFFFULL));
+		//CRC64 crc;
+		//crc.ResetCrcTable(0x42F0E1EBA9EA3693ULL);
+		//crc.ResetCrcState(0xFFFFFFFFFFFFFFFFULL);
+		//crc.UpdateCrcState(arr, sizeof(arr) - 1);
+		//printf("CRC64 = 0x%llX\n", crc.GetCrcState(true, 0xFFFFFFFFFFFFFFFFULL));
+		constexpr auto c = SimpleCrc<CRC64>(std::span{arr, sizeof(arr) - 1}, 0x42F0E1EBA9EA3693ULL, 0xFFFFFFFFFFFFFFFFULL, 0xFFFFFFFFFFFFFFFFULL);
+		printf("CRC64 = 0x%llX\n", c);
 	}
 	
 	{
@@ -38,7 +40,6 @@ int main(void)
 		crc.ResetCrcState(0);
 		crc.UpdateCrcState(arr, sizeof(arr) - 1);
 		printf("CRC8 = 0x%X\n", crc.GetCrcState());
-
 	}
 
 	return 0;
